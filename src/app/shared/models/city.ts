@@ -1,4 +1,4 @@
-export interface CityInfo {
+export interface City {
   geonameid: number;
   name: string;
   country: string;

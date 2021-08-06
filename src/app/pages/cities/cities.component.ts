@@ -4,7 +4,8 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
 
-import { CityInfo } from 'src/app/shared/models/city-info';
+import { City } from 'src/app/shared/models/city';
+import { ErrorDataResponse, CitiesDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
 
 import { CitiesService } from 'src/app/shared/services/cities.service';
 
@@ -15,8 +16,10 @@ import { CitiesService } from 'src/app/shared/services/cities.service';
 })
 export class CitiesComponent implements OnInit {
   public inputControl: FormControl = new FormControl();
-  public filteredCities: Array<CityInfo> = [];
-  public preferredCities: Array<CityInfo> = [];
+  public preferredCities: Array<City> = [];
+  public filteredCities: Array<City> = [];
+  public totalPreferredCities: number = 0;
+  public totalFilteredCities: number = 0;
   public isLoadingPreferredCities: boolean = true;
 
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
@@ -25,74 +28,65 @@ export class CitiesComponent implements OnInit {
 
   ngOnInit(): void {
     this._getPreferredCities();
-
     this.inputControl.valueChanges.pipe(
       debounceTime(300),
       filter((query) => query.length >= 3),
       distinctUntilChanged(),
       switchMap((query) => this.citiesService.getCities(query))
     ).subscribe(
-      response => {
-        if (response.cities) {
-          this.filteredCities = response.cities;
-        } else if (response.error) {
+      (response: CitiesDataResponse) => {
+        if (response.error) {
           console.warn('Something went wrong searching for the city');
           console.warn('Error message:', response.error);
+        } else {
+          this.filteredCities = response.cities;
+          this.totalFilteredCities = response.total;
         }
       }
     );
-    // const cityId: number = 2193733; // 2193733 = "Auckland";
-    // this.citiesService.getCity(cityId).subscribe(
-    //   response => {
-    //     if (response.city) {
-    //       console.log('City:', response.city)
-    //     } else if (response.error) {
-    //       console.warn(`Something went wrong looking for city with ID "${cityId}"`);
-    //       console.warn('Error message:', response.error);
-    //     }
-    //     console.log('----------------');
-    //   }
-    // );
   }
 
-  public selectPreferredCity(event: MatAutocompleteSelectedEvent): void {
-    const newCity: CityInfo = event.option.value;
-    this.preferredCities.push(newCity);
+  public addPreferredCity(event: MatAutocompleteSelectedEvent): void {
+    const newCity: City = event.option.value;
+    if (!this.preferredCities.find((city: City) => city.geonameid === newCity.geonameid)) {
+      this.preferredCities.push(newCity);
+      this._savePreferredCitySelection(newCity.geonameid, true);
+    }
     this.searchInput.nativeElement.value = '';
     this.inputControl.setValue('');
-    this._handlePreferredCitiesSaving(newCity, true);
   }
 
-  public removePreferredCity(cityToRemove: CityInfo): void {
+  public removePreferredCity(cityToRemove: City): void {
     const index = this.preferredCities.indexOf(cityToRemove);
     if (index >= 0) {
       this.preferredCities.splice(index, 1);
-      this._handlePreferredCitiesSaving(cityToRemove, false);
+      this._savePreferredCitySelection(cityToRemove.geonameid, false);
     }
   }
 
   private _getPreferredCities(): void {
     this.citiesService.getPreferredCities().subscribe(
-      response => {
-        if (response.preferredCities) {
-          this.preferredCities = response.preferredCities;
-        } else if (response.error) {
+      (response: PreferredCitiesDataResponse) => {
+        if (response.error) {
           console.warn('Something went wrong getting the preferred cities');
           console.warn('Error message:', response.error);
+        } else {
+          this.preferredCities = response.cities;
+          this.totalPreferredCities = response.total;
         }
         this.isLoadingPreferredCities = false;
       }
     );
   }
 
-  private _handlePreferredCitiesSaving(city: CityInfo, selected: boolean): void {
-    this.citiesService.savePreferredCities([{ id: city.geonameid, selected }]).subscribe(
-      response => {
-        if (response.ok) {
-          console.log('Preferred cities changes were saved!');
-        } else if (response.error) {
-          console.warn('Something went wrong');
+  private _savePreferredCitySelection(id: number, selected: boolean): void {
+    this.citiesService.savePreferredCities([{ id, selected }]).subscribe(
+      (response: ErrorDataResponse) => {
+        if (response.error) {
+          console.warn('Something went wrong saving the preferred cities');
           console.warn('Error message:', response.error);
+        } else {
+          console.log('Preferred cities changes were saved!');
         }
       }
     );

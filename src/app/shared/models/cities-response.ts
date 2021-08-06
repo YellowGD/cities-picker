@@ -1,8 +1,8 @@
-import { CityInfo } from './city-info';
+import { City } from './city';
 import { LinksResponse } from './links-response';
 
 export interface CitiesResponse {
-  data: Array<CityInfo>;
+  data: Array<City>;
   total: number;
   links: LinksResponse;
   filter?: string;

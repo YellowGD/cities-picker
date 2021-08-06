@@ -7,7 +7,7 @@
     </p>
     <p *ngIf="!isLoadingPreferredCities && !preferredCities.length">
       It looks like you don't have preferred cities yeat. 
-      Go ahead and get fun selecting cities using "Cities search".
+      Go ahead and get fun selecting cities using "Cities search" below.
     </p>
     <p *ngIf="!isLoadingPreferredCities && preferredCities.length">
       Add more preferred cities using "Cities search". 
@@ -37,7 +37,7 @@
       matInput
       [formControl]="inputControl"
       [matAutocomplete]="auto">
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectPreferredCity($event)">
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addPreferredCity($event)">
       <mat-option *ngFor="let city of filteredCities" [value]="city">
         <div class="option-container">
           <span class="option-main-text">{{ city.name }}</span>
