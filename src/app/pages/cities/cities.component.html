@@ -1,2 +1,49 @@
-<p>cities works!</p>
-<app-multi-select></app-multi-select>
+<div class="page-container">
+  <h1>Cities of the world</h1>
+  <h2>Preferred cities</h2>
+  <div class="info">
+    <p *ngIf="isLoadingPreferredCities">
+      Loading preferred cities...
+    </p>
+    <p *ngIf="!isLoadingPreferredCities && !preferredCities.length">
+      It looks like you don't have preferred cities yeat. 
+      Go ahead and get fun selecting cities using "Cities search".
+    </p>
+    <p *ngIf="!isLoadingPreferredCities && preferredCities.length">
+      Add more preferred cities using "Cities search". 
+      Cities can be removed clicking on the X icon.
+    </p>
+  </div>
+  <mat-chip-list #chipList aria-label="Preferred cities list">
+    <mat-chip
+      *ngFor="let city of preferredCities"
+      [selectable]="true"
+      [removable]="true"
+      (removed)="removePreferredCity(city)">
+      {{ city.name }}
+      <mat-icon matChipRemove>cancel</mat-icon>
+    </mat-chip>
+  </mat-chip-list>
+  <h2>Cities search</h2>
+  <div class="info">
+    <p>Search cool cities!</p>
+  </div>
+  <mat-form-field appearance="fill">
+    <input 
+      #searchInput
+      type="text"
+      placeholder="Type to filter by city name or country"
+      aria-label="City"
+      matInput
+      [formControl]="inputControl"
+      [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectPreferredCity($event)">
+      <mat-option *ngFor="let city of filteredCities" [value]="city">
+        <div class="option-container">
+          <span class="option-main-text">{{ city.name }}</span>
+          <span class="option-sub-text">{{ city.subcountry + ' - ' + city.country }}</span>
+        </div>
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</div>

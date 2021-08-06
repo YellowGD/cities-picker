@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 
 import { Observable, of } from 'rxjs';
-import { catchError, map, mergeMap } from 'rxjs/operators';
+import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
 
 import { CityInfo } from 'src/app/shared/models/city-info';
 import { CitiesResponse } from 'src/app/shared/models/cities-response';
@@ -20,9 +20,12 @@ export class CitiesService {
   }
 
   public getCities(query: string): Observable<any> {
-    return this.http.get<CitiesResponse>(`${this.baseUrl}cities?filter=${query}`).pipe(
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append('filter', query);
+    queryParams = queryParams.append('limit', '10');
+    return this.http.get<CitiesResponse>(`${this.baseUrl}cities`, { params: queryParams }).pipe(
       map((response: CitiesResponse) => {
-        console.log(`CitiesService / getCities / response:`, response);
+        console.log('response:', response);
         return { cities: response.data };
       }),
       catchError(response => this.handleError(response))
