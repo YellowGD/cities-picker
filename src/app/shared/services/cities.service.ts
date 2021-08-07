@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http'
 
-import { Observable, of } from 'rxjs';
-import { catchError, combineAll, map, mergeMap, tap } from 'rxjs/operators';
+import { Observable, of, forkJoin } from 'rxjs';
+import { catchError, map, mergeMap } from 'rxjs/operators';
 
 import { City } from 'src/app/shared/models/city';
 import { CitiesAPIResponse, PreferredCitiesIdsAPIResponse } from 'src/app/shared/models/api-responses';
@@ -73,21 +73,29 @@ export class CitiesService {
       error: ''
     };
     return this._getPreferredCitiesIds().pipe(
-      mergeMap<PreferredCitiesIdsDataResponse, Array<Observable<CityResponse>>>((response: PreferredCitiesIdsDataResponse) => {
+      mergeMap<PreferredCitiesIdsDataResponse, Observable<PreferredCitiesDataResponse>>((response: PreferredCitiesIdsDataResponse) => {
         if (response.error) {
           throw new Error(response.error);
         } else {
-          preferredCitiesResponse.total = response.total;
-          return response.citiesIds.map((cityId: number) => this.getCity(cityId))
-        }
-      }),
-      combineAll(),
-      map<Array<CityResponse>, PreferredCitiesDataResponse>((response: Array<CityResponse>) => {
-        if (response.find((item: CityResponse) => item.error)) {
-          throw new Error('Missing cities detected!');
-        } else {
-          preferredCitiesResponse.cities = response.map((item: CityResponse) => item.city);
-          return preferredCitiesResponse;
+          if (response.citiesIds.length) {
+            preferredCitiesResponse.total = response.total;
+            return forkJoin(response.citiesIds.map((cityId: number) => this.getCity(cityId))).pipe(
+              map((citiesResponse: Array<CityResponse>) => {
+                if (citiesResponse.length) {
+                  if (citiesResponse.find((item: CityResponse) => item.error)) {
+                    throw new Error('Missing cities detected!');
+                  } else {
+                    preferredCitiesResponse.cities = citiesResponse.map((item: CityResponse) => item.city);
+                    return preferredCitiesResponse;
+                  }
+                } else {
+                  return preferredCitiesResponse;
+                }
+              })
+            );
+          } else {
+            return of(preferredCitiesResponse);
+          }
         }
       }),
       catchError(errorResponse => this._handleError(preferredCitiesResponse, errorResponse))
