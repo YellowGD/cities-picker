@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { CitiesService } from 'src/app/shared/services/cities.service';
 
@@ -24,7 +25,8 @@ import { MultiSelectComponent } from 'src/app/shared/components/multi-select/mul
     MatIconModule,
     MatInputModule,
     MatChipsModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatSnackBarModule
   ],
   providers: [
     CitiesService
@@ -36,6 +38,7 @@ import { MultiSelectComponent } from 'src/app/shared/components/multi-select/mul
     MatInputModule,
     MatChipsModule,
     MatAutocompleteModule,
+    MatSnackBarModule,
     MultiSelectComponent
   ]
 })

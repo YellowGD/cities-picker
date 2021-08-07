@@ -2,7 +2,7 @@
   <h1>Cities of the world</h1>
   <h2>Preferred cities</h2>
   <div class="info">
-    <p *ngIf="isLoadingPreferredCities">
+    <p class="status" *ngIf="isLoadingPreferredCities">
       Loading preferred cities...
     </p>
     <p *ngIf="!isLoadingPreferredCities && !preferredCities.length">
@@ -26,7 +26,12 @@
   </mat-chip-list>
   <h2>Cities search</h2>
   <div class="info">
-    <p>Search cool cities!</p>
+    <p *ngIf="!isSearchingCities">
+      Search cool cities!
+    </p>
+    <p class="status" *ngIf="isSearchingCities">
+      Searching cities...
+    </p>
   </div>
   <mat-form-field appearance="fill">
     <input 

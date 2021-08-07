@@ -1,8 +1,9 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
 
 import { City } from 'src/app/shared/models/city';
 import { ErrorDataResponse, CitiesDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
@@ -21,10 +22,14 @@ export class CitiesComponent implements OnInit {
   public totalPreferredCities: number = 0;
   public totalFilteredCities: number = 0;
   public isLoadingPreferredCities: boolean = true;
+  public isSearchingCities: boolean = false;
 
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
-  constructor(private citiesService: CitiesService) {}
+  constructor(
+    private citiesService: CitiesService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this._getPreferredCities();
@@ -32,16 +37,18 @@ export class CitiesComponent implements OnInit {
       debounceTime(300),
       filter((query) => query.length >= 3),
       distinctUntilChanged(),
-      switchMap((query) => this.citiesService.getCities(query))
+      tap(() => this.isSearchingCities = true),
+      switchMap((query) => this.citiesService.getCities(query)),
     ).subscribe(
       (response: CitiesDataResponse) => {
         if (response.error) {
-          console.warn('Something went wrong searching for the city');
-          console.warn('Error message:', response.error);
+          this.snackBar.open(`Something went wrong searching for the city. Error message: "${response.error}" Please repeat the search.` , 'OK');
+          this._cleanInput();
         } else {
           this.filteredCities = response.cities;
           this.totalFilteredCities = response.total;
         }
+        this.isSearchingCities = false;
       }
     );
   }
@@ -52,8 +59,7 @@ export class CitiesComponent implements OnInit {
       this.preferredCities.push(newCity);
       this._savePreferredCitySelection(newCity.geonameid, true);
     }
-    this.searchInput.nativeElement.value = '';
-    this.inputControl.setValue('');
+    this._cleanInput();
   }
 
   public removePreferredCity(cityToRemove: City): void {
@@ -68,8 +74,7 @@ export class CitiesComponent implements OnInit {
     this.citiesService.getPreferredCities().subscribe(
       (response: PreferredCitiesDataResponse) => {
         if (response.error) {
-          console.warn('Something went wrong getting the preferred cities');
-          console.warn('Error message:', response.error);
+          this.snackBar.open(`Something went wrong getting the preferred cities. Error message: "${response.error}" To avoid further inconvenience please refresh the page.`, 'OK');
         } else {
           this.preferredCities = response.cities;
           this.totalPreferredCities = response.total;
@@ -83,12 +88,14 @@ export class CitiesComponent implements OnInit {
     this.citiesService.savePreferredCities([{ id, selected }]).subscribe(
       (response: ErrorDataResponse) => {
         if (response.error) {
-          console.warn('Something went wrong saving the preferred cities');
-          console.warn('Error message:', response.error);
-        } else {
-          console.log('Preferred cities changes were saved!');
+          this.snackBar.open(`Something went wrong saving the preferred cities. Error message: "${response.error}" To avoid further inconvenience please refresh the page.`, 'OK');
         }
       }
     );
+  }
+
+  private _cleanInput(): void {
+    this.searchInput.nativeElement.value = '';
+    this.inputControl.setValue('');
   }
 }
