@@ -12,6 +12,7 @@ export interface CityResponse {
 export interface CitiesDataResponse {
   cities: Array<City>;
   total: number;
+  offset: string,
   error: string;
 }
 

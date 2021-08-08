@@ -23,6 +23,8 @@ export class CitiesComponent implements OnInit {
   public totalFoundCities: number = 0;
   public isLoadingPreferredCities: boolean = true;
   public isSearchingCities: boolean = false;
+  private lastQuery: string = '';
+  private citiesOffset: string = '';
 
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
@@ -33,24 +35,7 @@ export class CitiesComponent implements OnInit {
 
   ngOnInit(): void {
     this._getPreferredCities();
-    this.inputControl.valueChanges.pipe(
-      debounceTime(300),
-      filter((query) => query.length >= 3),
-      distinctUntilChanged(),
-      tap(() => this.isSearchingCities = true),
-      switchMap((query) => this.citiesService.getCities(query)),
-    ).subscribe(
-      (response: CitiesDataResponse) => {
-        if (response.error) {
-          this.snackBar.open(`Something went wrong searching for the city. Error message: "${response.error}" Please repeat the search.` , 'OK');
-          this._cleanInput();
-        } else {
-          this.filteredCities = response.cities;
-          this.totalFoundCities = response.total;
-        }
-        this.isSearchingCities = false;
-      }
-    );
+    this._subscribeInputChanges();
   }
 
   public addPreferredCity(event: MatAutocompleteSelectedEvent): void {
@@ -71,7 +56,10 @@ export class CitiesComponent implements OnInit {
   }
 
   public viewMore() {
-    console.log('View More!');
+    this.isSearchingCities = true;
+    this.citiesService.getCities(this.lastQuery, this.citiesOffset).subscribe(
+      (response: CitiesDataResponse) => this._handleCitiesResponse(response, true)
+    );
   }
 
   private _getPreferredCities(): void {
@@ -86,6 +74,37 @@ export class CitiesComponent implements OnInit {
         this.isLoadingPreferredCities = false;
       }
     );
+  }
+
+  private _subscribeInputChanges(): void {
+    this.inputControl.valueChanges.pipe(
+      debounceTime(300),
+      filter((query: string) => query.length >= 3),
+      distinctUntilChanged(),
+      tap((query: string) => {
+        this.isSearchingCities = true;
+        this.lastQuery = query;
+      }),
+      switchMap((query: string) => this.citiesService.getCities(query)),
+    ).subscribe(
+      (response: CitiesDataResponse) => this._handleCitiesResponse(response)
+    );
+  }
+
+  private _handleCitiesResponse(response: CitiesDataResponse, add: boolean = false): void {
+    if (response.error) {
+      this.snackBar.open(`Something went wrong searching for the city. Error message: "${response.error}" Please repeat the search.` , 'OK');
+      this._cleanInput();
+    } else {
+      if (add) {
+        this.filteredCities = [...this.filteredCities, ...response.cities];
+      } else {
+        this.filteredCities = response.cities;
+      }
+      this.totalFoundCities = response.total;
+      this.citiesOffset = response.offset;
+    }
+    this.isSearchingCities = false;
   }
 
   private _savePreferredCitySelection(id: number, selected: boolean): void {

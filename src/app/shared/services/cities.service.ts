@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable, of, forkJoin } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 
 import { City } from 'src/app/shared/models/city';
-import { CitiesAPIResponse, PreferredCitiesIdsAPIResponse } from 'src/app/shared/models/api-responses';
+import { LinksAPIResponse, CitiesAPIResponse, PreferredCitiesIdsAPIResponse } from 'src/app/shared/models/api-responses';
 import { ErrorDataResponse, CityResponse, CitiesDataResponse, PreferredCitiesIdsDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
 
 @Injectable({
@@ -19,19 +19,22 @@ export class CitiesService {
     this.baseUrl = 'http://localhost:3030/';
   }
 
-  public getCities(query: string): Observable<CitiesDataResponse> {
+  public getCities(query: string, offset: string = '0'): Observable<CitiesDataResponse> {
     const baseResponse: CitiesDataResponse = { 
       cities: [], 
-      total: 0, 
+      total: 0,
+      offset: '0',
       error: '' 
     };
     let queryParams = new HttpParams();
     queryParams = queryParams.append('filter', query);
     queryParams = queryParams.append('limit', '10');
+    queryParams = queryParams.append('offset', offset);
     return this.http.get<CitiesAPIResponse>(`${this.baseUrl}cities`, { params: queryParams }).pipe(
       map<CitiesAPIResponse, CitiesDataResponse>((response: CitiesAPIResponse) => {
         baseResponse.cities = response.data;
         baseResponse.total = response.total;
+        baseResponse.offset = this._getOffset(response.links);
         baseResponse.error = '';
         return baseResponse;
       }),
@@ -128,5 +131,14 @@ export class CitiesService {
       errorObject = { error: 'unknown error'};
     }
     return of(Object.assign(baseResponse, errorObject))
+  }
+
+  private _getOffset(links: LinksAPIResponse): string {
+    let offset: string = '0';
+    if (links.next) {
+      const offsetInfoIndex: number = links.next.indexOf('offset');
+      offset = links.next.substring(offsetInfoIndex + 7);
+    }
+    return offset;
   }
 }
