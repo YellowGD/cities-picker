@@ -86,7 +86,7 @@ export class CitiesService {
               map((citiesResponse: Array<CityResponse>) => {
                 if (citiesResponse.length) {
                   if (citiesResponse.find((item: CityResponse) => item.error)) {
-                    throw new Error('Missing cities detected!');
+                    throw new Error('Missing cities!');
                   } else {
                     preferredCitiesResponse.cities = citiesResponse.map((item: CityResponse) => item.city);
                     return preferredCitiesResponse;

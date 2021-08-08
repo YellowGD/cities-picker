@@ -1,0 +1,14 @@
+<div class="error-message">
+  <div class="info">
+    <span class="explanation">{{ data.info.explanation }}</span>
+    <span class="message">{{ data.info.message }}</span>
+    <span class="recommendation">{{ data.info.recommendation }}</span>
+  </div>
+  <button
+    mat-raised-button
+    type="buton"
+    aria-label="Close Button"
+    (click)="snackBarRef.dismiss()">
+    {{ data.closeText }}
+  </button>
+</div>

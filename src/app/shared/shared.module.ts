@@ -12,8 +12,12 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { CitiesService } from 'src/app/shared/services/cities.service';
 
+import { ErrorMessageComponent } from './components/error-message/error-message.component';
+
 @NgModule({
-  declarations: [],
+  declarations: [
+    ErrorMessageComponent
+  ],
   imports: [
     CommonModule,
     HttpClientModule,
@@ -39,7 +43,8 @@ import { CitiesService } from 'src/app/shared/services/cities.service';
     MatInputModule,
     MatChipsModule,
     MatAutocompleteModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    ErrorMessageComponent
   ]
 })
 export class SharedModule { }

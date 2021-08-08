@@ -5,10 +5,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
 
+import { MessagesConstants } from 'src/app/shared/constants/messages-constants';
+
 import { City } from 'src/app/shared/models/city';
 import { ErrorDataResponse, CitiesDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
 
 import { CitiesService } from 'src/app/shared/services/cities.service';
+
+import { ErrorMessageComponent } from 'src/app/shared/components/error-message/error-message.component';
 
 @Component({
   selector: 'app-cities',
@@ -66,7 +70,7 @@ export class CitiesComponent implements OnInit {
     this.citiesService.getPreferredCities().subscribe(
       (response: PreferredCitiesDataResponse) => {
         if (response.error) {
-          this.snackBar.open(`Something went wrong getting the preferred cities. Error message: "${response.error}" To avoid further inconvenience please refresh the page.`, 'OK');
+          this._openErrorMessage(MessagesConstants.EXPLANATION_GETTING, response.error, MessagesConstants.RECOMMENDATION_REFRESH);
         } else {
           this.preferredCities = response.cities;
           this.totalPreferredCities = response.total;
@@ -93,7 +97,7 @@ export class CitiesComponent implements OnInit {
 
   private _handleCitiesResponse(response: CitiesDataResponse, add: boolean = false): void {
     if (response.error) {
-      this.snackBar.open(`Something went wrong searching for the city. Error message: "${response.error}" Please repeat the search.` , 'OK');
+      this._openErrorMessage(MessagesConstants.EXPLANATION_SEARCHING, response.error, MessagesConstants.RECOMMENDATION_REPEAT);
       this._cleanInput();
     } else {
       if (add) {
@@ -111,7 +115,7 @@ export class CitiesComponent implements OnInit {
     this.citiesService.savePreferredCities([{ id, selected }]).subscribe(
       (response: ErrorDataResponse) => {
         if (response.error) {
-          this.snackBar.open(`Something went wrong saving the preferred cities. Error message: "${response.error}" To avoid further inconvenience please refresh the page.`, 'OK');
+          this._openErrorMessage(MessagesConstants.EXPLANATION_SAVING, response.error, MessagesConstants.RECOMMENDATION_REFRESH);
         }
       }
     );
@@ -120,5 +124,19 @@ export class CitiesComponent implements OnInit {
   private _cleanInput(): void {
     this.searchInput.nativeElement.value = '';
     this.inputControl.setValue('');
+  }
+
+  private _openErrorMessage(explanation: string, message: string, recommendation: string): void {
+    this.snackBar.openFromComponent(ErrorMessageComponent, { 
+      data: {
+        info: {
+          explanation,
+          message,
+          recommendation
+        },             
+        closeText: 'OK'
+      },
+      panelClass: 'error-messsage-color'
+    });
   }
 }

@@ -1,0 +1,25 @@
+.error-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .info {
+    color: ivory;
+
+    span {
+      display: block;
+    }
+
+    .message {
+      margin: 0.5rem 0;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+  }
+
+  button {
+    margin-left: 1rem;
+    background-color: ivory;
+    color: #CD2525;
+  }
+}
