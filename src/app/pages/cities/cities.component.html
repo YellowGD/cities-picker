@@ -49,6 +49,16 @@
           <span class="option-sub-text">{{ city.subcountry + ' - ' + city.country }}</span>
         </div>
       </mat-option>
+      <div class="results-info" *ngIf="filteredCities.length < totalFoundCities">
+        <label>Showing {{ filteredCities.length }} of {{ totalFoundCities }}</label>
+        <button
+          mat-stroked-button
+          type="button"
+          aria-label="View More"
+          (click)="viewMore()">
+          View more
+        </button>
+      </div>
     </mat-autocomplete>
   </mat-form-field>
 </div>

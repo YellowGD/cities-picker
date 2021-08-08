@@ -20,7 +20,7 @@ export class CitiesComponent implements OnInit {
   public preferredCities: Array<City> = [];
   public filteredCities: Array<City> = [];
   public totalPreferredCities: number = 0;
-  public totalFilteredCities: number = 0;
+  public totalFoundCities: number = 0;
   public isLoadingPreferredCities: boolean = true;
   public isSearchingCities: boolean = false;
 
@@ -46,7 +46,7 @@ export class CitiesComponent implements OnInit {
           this._cleanInput();
         } else {
           this.filteredCities = response.cities;
-          this.totalFilteredCities = response.total;
+          this.totalFoundCities = response.total;
         }
         this.isSearchingCities = false;
       }
@@ -68,6 +68,10 @@ export class CitiesComponent implements OnInit {
       this.preferredCities.splice(index, 1);
       this._savePreferredCitySelection(cityToRemove.geonameid, false);
     }
+  }
+
+  public viewMore() {
+    console.log('View More!');
   }
 
   private _getPreferredCities(): void {

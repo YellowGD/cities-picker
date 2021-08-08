@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { SharedModule } from 'src/app/shared/shared.module'
 
@@ -10,7 +9,6 @@ import { CitiesComponent } from 'src/app/pages/cities/cities.component';
     CitiesComponent
   ],
   imports: [
-    CommonModule,
     SharedModule
   ],
   exports: [
