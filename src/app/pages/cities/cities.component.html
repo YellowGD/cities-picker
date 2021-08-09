@@ -20,7 +20,7 @@
       [selectable]="true"
       [removable]="true"
       (removed)="removePreferredCity(city)">
-      {{ city.name }}
+      <span>{{ city.name }}</span>&nbsp;<span *ngIf="city.subcountry">{{ "(" + city.subcountry + ")" }}</span>
       <mat-icon matChipRemove>cancel</mat-icon>
     </mat-chip>
   </mat-chip-list>
