@@ -27,6 +27,7 @@ export class CitiesComponent implements OnInit {
   public totalFoundCities: number = 0;
   public isLoadingPreferredCities: boolean = true;
   public isSearchingCities: boolean = false;
+  public noResults: boolean = false;
   private lastQuery: string = '';
   private citiesOffset: string = '';
 
@@ -82,6 +83,7 @@ export class CitiesComponent implements OnInit {
 
   private _subscribeInputChanges(): void {
     this.inputControl.valueChanges.pipe(
+      tap(() => this.noResults = false),
       debounceTime(300),
       filter((query: string) => query.length >= 3),
       distinctUntilChanged(),
@@ -107,6 +109,7 @@ export class CitiesComponent implements OnInit {
       }
       this.totalFoundCities = response.total;
       this.citiesOffset = response.offset;
+      this.noResults = response.total === 0 ? true : false;
     }
     this.isSearchingCities = false;
   }

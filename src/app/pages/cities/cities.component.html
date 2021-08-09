@@ -2,7 +2,7 @@
   <h1>Cities of the world</h1>
   <h2>Preferred cities</h2>
   <div class="info">
-    <p class="status" *ngIf="isLoadingPreferredCities">
+    <p class="progress" *ngIf="isLoadingPreferredCities">
       Loading preferred cities...
     </p>
     <p *ngIf="!isLoadingPreferredCities && !preferredCities.length">
@@ -26,10 +26,13 @@
   </mat-chip-list>
   <h2>Cities search</h2>
   <div class="info">
-    <p *ngIf="!isSearchingCities">
+    <p *ngIf="!isSearchingCities && !noResults">
       Search cool cities!
     </p>
-    <p class="status" *ngIf="isSearchingCities">
+    <p class="no-results" *ngIf="!isSearchingCities && noResults">
+      No results
+    </p>
+    <p class="progress" *ngIf="isSearchingCities">
       Searching cities...
     </p>
   </div>
@@ -50,7 +53,7 @@
         </div>
       </mat-option>
       <div class="results-info" *ngIf="filteredCities.length < totalFoundCities">
-        <label>Showing {{ filteredCities.length }} of {{ totalFoundCities }}</label>
+        <span>Showing {{ filteredCities.length }} of {{ totalFoundCities }}</span>
         <button
           mat-stroked-button
           type="button"

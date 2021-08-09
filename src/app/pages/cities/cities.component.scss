@@ -5,8 +5,12 @@
   p {
     margin: 0 0 12px;
 
-    &.status {
+    &.progress {
       color: orange;
+    }
+
+    &.no-results {
+      color: red;
     }
   }
 }
