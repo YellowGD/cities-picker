@@ -7,13 +7,14 @@ import { of } from 'rxjs';
 import { MessagesConstants } from 'src/app/shared/constants/messages-constants';
 
 import { City } from 'src/app/shared/models/city';
+import { ErrorDataResponse, CitiesDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
 
 import { CitiesService } from 'src/app/shared/services/cities.service';
 
 import { CitiesComponent } from './cities.component';
 import { ErrorMessageComponent } from 'src/app/shared/components/error-message/error-message.component';
 
-const preferredCitiesDataResponseWithoutError = {
+const preferredCitiesDataResponseWithoutError: PreferredCitiesDataResponse = {
   cities: [
     {
       geonameid: 2193733,
@@ -38,13 +39,13 @@ const preferredCitiesDataResponseWithoutError = {
   error: ''
 };
 
-const preferredCitiesDataResponseWithError = {
+const preferredCitiesDataResponseWithError: PreferredCitiesDataResponse = {
   cities: [],
   total: 0,
   error: 'Unknown error'
 };
 
-const citiesDataResponseWithoutError = {
+const citiesDataResponseWithoutError: CitiesDataResponse = {
   cities: [
     {
       geonameid: 5969782,
@@ -64,18 +65,18 @@ const citiesDataResponseWithoutError = {
   error: ''
 };
 
-const citiesDataResponseWithError = {
+const citiesDataResponseWithError: CitiesDataResponse = {
   cities: [],
   total: 0,
   offset: '0',
   error: 'Unknown error'
 };
 
-const errorDataResponseWithoutError = {
+const errorDataResponseWithoutError: ErrorDataResponse = {
   error: ''
 };
 
-const errorDataResponseWithError = {
+const errorDataResponseWithError: ErrorDataResponse = {
   error: 'Unknown error'
 };
 
