@@ -1,10 +1,10 @@
 import { City } from './city';
 
-export interface ErrorDataResponse {
+export interface SaveConfirmationDataResponse {
   error: string;
 }
 
-export interface CityResponse {
+export interface CityDataResponse {
   city: City;
   error: string;
 }

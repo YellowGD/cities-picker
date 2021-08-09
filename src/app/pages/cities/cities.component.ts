@@ -8,7 +8,7 @@ import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs
 import { MessagesConstants } from 'src/app/shared/constants/messages-constants';
 
 import { City } from 'src/app/shared/models/city';
-import { ErrorDataResponse, CitiesDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
+import { SaveConfirmationDataResponse, CitiesDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
 
 import { CitiesService } from 'src/app/shared/services/cities.service';
 
@@ -60,7 +60,7 @@ export class CitiesComponent implements OnInit {
     }
   }
 
-  public viewMore() {
+  public viewMore(): void {
     this.isSearchingCities = true;
     this.citiesService.getCities(this.lastQuery, this.citiesOffset).subscribe(
       (response: CitiesDataResponse) => this._handleCitiesResponse(response, true)
@@ -116,7 +116,7 @@ export class CitiesComponent implements OnInit {
 
   private _savePreferredCitySelection(id: number, selected: boolean): void {
     this.citiesService.savePreferredCities([{ id, selected }]).subscribe(
-      (response: ErrorDataResponse) => {
+      (response: SaveConfirmationDataResponse) => {
         if (response.error) {
           this._openErrorMessage(MessagesConstants.EXPLANATION_SAVING, response.error, MessagesConstants.RECOMMENDATION_REFRESH);
         }

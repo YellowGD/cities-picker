@@ -7,7 +7,7 @@ import { of } from 'rxjs';
 import { MessagesConstants } from 'src/app/shared/constants/messages-constants';
 
 import { City } from 'src/app/shared/models/city';
-import { ErrorDataResponse, CitiesDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
+import { SaveConfirmationDataResponse, CitiesDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
 
 import { CitiesService } from 'src/app/shared/services/cities.service';
 
@@ -72,18 +72,18 @@ const citiesDataResponseWithError: CitiesDataResponse = {
   error: 'Unknown error'
 };
 
-const errorDataResponseWithoutError: ErrorDataResponse = {
+const saveConfirmationDataResponseWithoutError: SaveConfirmationDataResponse = {
   error: ''
 };
 
-const errorDataResponseWithError: ErrorDataResponse = {
+const saveConfirmationDataResponseWithError: SaveConfirmationDataResponse = {
   error: 'Unknown error'
 };
 
 class MockCitiesService {
   getCities = () => of(citiesDataResponseWithoutError);
   getPreferredCities = () => of(preferredCitiesDataResponseWithoutError);
-  savePreferredCities = () => of(errorDataResponseWithoutError);
+  savePreferredCities = () => of(saveConfirmationDataResponseWithoutError);
 }
 
 class MockMatSnackBar {
@@ -257,7 +257,7 @@ describe('CitiesComponent', () => {
   it('should call "savePreferredCities" and then "_openErrorMessage" when "_savePreferredCitySelection" is called and the response has error', inject([CitiesService], (citiesService: CitiesService) => {
     // Arrange
     const cityForSave: City = preferredCitiesDataResponseWithoutError.cities[0];
-    citiesService.savePreferredCities = () => of(errorDataResponseWithError);
+    citiesService.savePreferredCities = () => of(saveConfirmationDataResponseWithError);
     spyOn(citiesService, 'savePreferredCities').and.callThrough();
     spyOn<any>(component, '_openErrorMessage');
     // Act

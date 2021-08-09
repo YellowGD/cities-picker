@@ -6,7 +6,7 @@ import { catchError, map, mergeMap } from 'rxjs/operators';
 
 import { City } from 'src/app/shared/models/city';
 import { LinksAPIResponse, CitiesAPIResponse, PreferredCitiesIdsAPIResponse } from 'src/app/shared/models/api-responses';
-import { ErrorDataResponse, CityResponse, CitiesDataResponse, PreferredCitiesIdsDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
+import { SaveConfirmationDataResponse, CityDataResponse, CitiesDataResponse, PreferredCitiesIdsDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
 
 @Injectable({
   providedIn: 'root'
@@ -42,13 +42,13 @@ export class CitiesService {
     );
   }
 
-  public getCity(id: number): Observable<CityResponse> {
-    const baseResponse: CityResponse = {
+  public getCity(id: number): Observable<CityDataResponse> {
+    const baseResponse: CityDataResponse = {
       city: { geonameid: 0, name: '', country: '' },
       error: ''
     };
     return this.http.get<City>(`${this.baseUrl}cities/${id}`).pipe(
-      map<City, CityResponse>((response: City) => {
+      map<City, CityDataResponse>((response: City) => {
         baseResponse.city = response;
         baseResponse.error = '';
         return baseResponse;
@@ -57,14 +57,14 @@ export class CitiesService {
     );
   }
 
-  public savePreferredCities(preferredCitiesSelection: Array<any>): Observable<ErrorDataResponse> {
-    const baseResponse: ErrorDataResponse = {
+  public savePreferredCities(preferredCitiesSelection: Array<any>): Observable<SaveConfirmationDataResponse> {
+    const baseResponse: SaveConfirmationDataResponse = {
       error: ''
     };
     const payload = {};
     preferredCitiesSelection.map((preferredCitySelection: any) => Object.assign(payload, { [preferredCitySelection.id]: preferredCitySelection.selected }));
     return this.http.patch<PreferredCitiesIdsAPIResponse>(`${this.baseUrl}preferences/cities`, payload).pipe(
-      map<PreferredCitiesIdsAPIResponse, ErrorDataResponse>(() => baseResponse),
+      map<PreferredCitiesIdsAPIResponse, SaveConfirmationDataResponse>(() => baseResponse),
       catchError(errorResponse => this._handleError(baseResponse, errorResponse))
     );
   }
@@ -83,12 +83,12 @@ export class CitiesService {
           if (response.citiesIds.length) {
             preferredCitiesResponse.total = response.total;
             return forkJoin(response.citiesIds.map((cityId: number) => this.getCity(cityId))).pipe(
-              map((citiesResponse: Array<CityResponse>) => {
+              map((citiesResponse: Array<CityDataResponse>) => {
                 if (citiesResponse.length) {
-                  if (citiesResponse.find((item: CityResponse) => item.error)) {
+                  if (citiesResponse.find((item: CityDataResponse) => item.error)) {
                     throw new Error('Missing cities!');
                   } else {
-                    preferredCitiesResponse.cities = citiesResponse.map((item: CityResponse) => item.city);
+                    preferredCitiesResponse.cities = citiesResponse.map((item: CityDataResponse) => item.city);
                     return preferredCitiesResponse;
                   }
                 } else {

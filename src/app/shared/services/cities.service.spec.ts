@@ -3,7 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { City } from 'src/app/shared/models/city';
 import { LinksAPIResponse, CitiesAPIResponse, PreferredCitiesIdsAPIResponse } from 'src/app/shared/models/api-responses';
-import { ErrorDataResponse, CityResponse, CitiesDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
+import { SaveConfirmationDataResponse, CityDataResponse, CitiesDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
 
 import { CitiesService } from './cities.service';
 import {  } from '../models/data-responses';
@@ -48,11 +48,11 @@ const preferredCitiesIdsAPIResponse: PreferredCitiesIdsAPIResponse = {
   links: linksAPIResponse
 };
 
-const errorDataResponse: ErrorDataResponse = {
+const saveConfirmationDataResponse: SaveConfirmationDataResponse = {
   error: ''
 };
 
-const cityDataResponse: CityResponse = {
+const cityDataResponse: CityDataResponse = {
   city: {
     geonameid: 2190324,
     name: 'Hamilton',
@@ -140,7 +140,7 @@ describe('CitiesService', () => {
 
   it('should make a PATCH http request to "preferences/cities" when "savePreferredCities" is called', () => {
     service.savePreferredCities([{ id: 2190324, selected: true }]).subscribe(
-      (response) => expect(response).toEqual(errorDataResponse)
+      (response) => expect(response).toEqual(saveConfirmationDataResponse)
     );
     const req = httpTestingController.expectOne(`${baseUrl}preferences/cities`);
     expect(req.request.method).toEqual('PATCH');
@@ -159,7 +159,7 @@ describe('CitiesService', () => {
 
   it('should extend "baseResponse" with the appropriate error message using "errorResponse" when "_handleError" is called', () => {
     // Arrange
-    const baseResponse: CityResponse = {
+    const baseResponse: CityDataResponse = {
       city: { geonameid: 0, name: '', country: '' },
       error: ''
     };
@@ -168,7 +168,7 @@ describe('CitiesService', () => {
         message: 'There is a glitch in the Matrix!'
       }
     };
-    const result: CityResponse = {
+    const result: CityDataResponse = {
       city: { geonameid: 0, name: '', country: '' },
       error: 'There is a glitch in the Matrix!'
     }
