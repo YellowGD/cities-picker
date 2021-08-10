@@ -48,8 +48,13 @@
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addPreferredCity($event)">
       <mat-option *ngFor="let city of filteredCities" [value]="city">
         <div class="option-container">
-          <span class="option-main-text">{{ city.name }}</span>
-          <span class="option-sub-text">{{ city.subcountry + ' - ' + city.country }}</span>
+          <div class="option-texts">
+            <span class="option-main-text">{{ city.name }}</span>
+            <span class="option-sub-text">{{ city.subcountry + ' - ' + city.country }}</span>
+          </div>
+          <div class="option-preferred" *ngIf="city.preferred">
+            <mat-icon>favorite</mat-icon>
+          </div>
         </div>
       </mat-option>
       <div class="results-info" *ngIf="filteredCities.length < totalFoundCities">

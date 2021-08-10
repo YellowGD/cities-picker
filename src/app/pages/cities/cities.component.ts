@@ -47,6 +47,7 @@ export class CitiesComponent implements OnInit {
     const newCity: City = event.option.value;
     if (!this.preferredCities.find((city: City) => city.geonameid === newCity.geonameid)) {
       this.preferredCities.push(newCity);
+      this._updateCityPreferredStatus(newCity, true);
       this._savePreferredCitySelection(newCity.geonameid, true);
     }
     this._cleanInput();
@@ -56,6 +57,7 @@ export class CitiesComponent implements OnInit {
     const index = this.preferredCities.indexOf(cityToRemove);
     if (index >= 0) {
       this.preferredCities.splice(index, 1);
+      this._updateCityPreferredStatus(cityToRemove, false);
       this._savePreferredCitySelection(cityToRemove.geonameid, false);
     }
   }
@@ -107,6 +109,7 @@ export class CitiesComponent implements OnInit {
       } else {
         this.filteredCities = response.cities;
       }
+      this._markPreferredCities();
       this.totalFoundCities = response.total;
       this.citiesOffset = response.offset;
       this.noResults = response.total === 0 ? true : false;
@@ -141,5 +144,20 @@ export class CitiesComponent implements OnInit {
       },
       panelClass: 'error-messsage-color'
     });
+  }
+
+  private _markPreferredCities(): void {
+    if (this.filteredCities.length) {
+      this.preferredCities.forEach((city: City) => {
+        this._updateCityPreferredStatus(city, true);
+      });
+    }
+  }
+
+  private _updateCityPreferredStatus(city: City, preferred: boolean): void {
+    const targetCity = this.filteredCities.find((c: City) => c.geonameid === city.geonameid);
+    if (targetCity) {
+      targetCity.preferred = preferred;
+    }
   }
 }
