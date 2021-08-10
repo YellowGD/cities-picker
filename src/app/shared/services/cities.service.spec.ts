@@ -6,7 +6,6 @@ import { LinksAPIResponse, CitiesAPIResponse, PreferredCitiesIdsAPIResponse } fr
 import { SaveConfirmationDataResponse, CityDataResponse, CitiesDataResponse, PreferredCitiesDataResponse } from 'src/app/shared/models/data-responses';
 
 import { CitiesService } from './cities.service';
-import {  } from '../models/data-responses';
 
 const city: City = {
   geonameid: 2190324,
